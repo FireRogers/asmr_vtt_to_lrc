@@ -92,8 +92,6 @@ void vtt_to_lrc(std::string path) //转化path路径(不包含后缀名)的vtt�
 
     std::string line;
 
-
-
     bool first = true;
 
     std::string name;
@@ -163,145 +161,119 @@ void vtt_to_lrc(std::string path) //转化path路径(不包含后缀名)的vtt�
             exit(1);
         }
     }
+
+    new_lrc << end_time << "\n";
 }
+
+std::string organizepath(std::string input) //对path路径进行修整,去掉开头的空格,去掉开头结尾的双引号
+{
+    std::size_t s = input.find_first_not_of(" \t\r\n");
+    
+    if(s != std::string::npos) input = input.substr(s,input.size() - s);
+
+    if(input.front() == '"' && input.back() == '"') input = input.substr(1,input.size() - 2);
+
+    return input;
+}
+
+std::string vttfile(std::string s) //生成vtt文件,返回路径
+{
+    std::cout << s<< " 开始\n";
+
+    fs::path path =s;
+    if(s.rfind(".wav.vtt") != std::string::npos || s.rfind(".mp3.vtt") != std::string::npos)
+    {
+        s = s.substr(0,s.size() - 8);
+        fs::path new_path = s + ".vtt";
+        fs::rename(path,new_path);
+        return s;
+    } 
+    else if(s.rfind(".vtt") != std::string::npos || s.rfind(".vtt") != std::string::npos)
+    {
+        return s.substr(0,s.size() - 4);
+    }
+    
+    return "-1";
+} 
 
 int main()
 {
     SetConsoleOutputCP(CP_UTF8);  // 输出代码页设为 UTF-8
     SetConsoleCP(CP_UTF8);        // 输入代码页设为 UTF-8
 
-    std::string input;//输入的文件地址
-    std::string i_path;//文件地址
-    fs::path path;
+    std::string input; //输入的地址
+    std::string path; //修完后的地址
 
     bool file;//输入的是文件夹还是vtt文件,true为文件夹
     
     while(1)
     {
-        printf("请输入文件地址\n");
+        std::cout << "请输入你要转换的文件绝对地址,或者文件夹绝对地址\n";
+        std::cout << "如果完成请输入0\n";
 
-        std::getline(std::cin,input);
+        getline(std::cin,input);
 
-        if(input.size() < 3)
-        {
-            printf("输入文件地址失败\n");
-            system("pause");            
-            system("cls");
-            input.clear();
+        if(input == "0") break;
+        else if(input.size() < 3) {
+            std::cout << "输入地址过短\n";
+            system("puase");system("cls");
             continue;
         }
 
-        int k = 0;
-        if(input.front() == ' ')
-        {
-            for(int i = 0; i < input.size();i++)
-            {
-                if(input[i] != ' ')
-                {
-                    k = i;
-                    break;
-                }
-            }
-            input = input.substr(k,input.size() - k);
-        }
-        if(input.front() == '"' && input.back() == '"')
-        {
-            input = input.substr(1,input.size() - 2);
-        }
+        input = organizepath(input);
 
-        if(fs::exists(input) && fs::is_directory(input))
-        {
-            file = true;
-            break;
-        }
-        else if(fs::exists(input) && fs::is_regular_file(input))
-        {
-            file = false;
-            break;
-        }
+        fs::path p = input;
+
+        if(fs::exists(p) && fs::is_directory(p)) file = true;
+        else if(fs::exists(p) && fs::is_regular_file(p)) file = false;
         else{
-            printf("输入文件地址失败");
-            system("pause");
-            system("cls");
-            input.clear();
-        }
-    }
+            std::cout << input << " 输入的地址不存在\n";
+            system("puase");system("cls");
+            continue;
+        } 
 
-    if(file)
-    {
-        for (const auto& entry : fs::directory_iterator(input)) {
-            path = entry.path();
-
-            i_path = path.string();
-
-            std::cout << path << "\n";
-
-            std::string new_input;
-
-            if(i_path.rfind(".wav.vtt") != std::string::npos || i_path.rfind(".mp3.vtt") != std::string::npos)
+        if(file)
+        {
+            for (const auto& entry : fs::directory_iterator(input))
             {
-                int n = i_path.rfind(".vtt");
-                new_input = i_path.substr(0,n-4) +".vtt";
 
-                fs::path newpath(new_input);
-
-                if(fs::exists(i_path) && fs::is_directory(i_path)) continue;
-
-                if(fs::exists(newpath) && fs::is_regular_file(newpath))
+                if(fs::is_directory(entry)) 
                 {
-                    printf("已有与改名后同名的文件存在\n");
-                    system("pause");
+                    std::cout << entry << " 是文件夹,不进行读取改变\n";
                     continue;
                 }
-
-                fs::rename(path,newpath);
-                std::cout << i_path << "改名完成\n"; 
-
-                std::cout << i_path << "开始生成lrc文件\n";
-                vtt_to_lrc(new_input.substr(0,new_input.rfind(".vtt")));
+                else if(fs::is_regular_file(entry))
+                {
+                    std::cout << entry << " 正在生成lrc\n";
+                    path = vttfile(entry.path().string());
+                    if(path == "-1") 
+                    {
+                        std::cout << input << " 该文件不为.vtt文件\n";
+                        continue; 
+                    }
+                    vtt_to_lrc(path);
+                }
             }
-            else if(i_path.rfind(".vtt") != std::string::npos)
-            {
-                std::cout << i_path << "开始生成lrc文件\n";
-                vtt_to_lrc(i_path.substr(0,i_path.rfind(".vtt")));
-            }
+
         }
-    }
-    else if(!file)
-    {
-        path = input;
-
-        std::cout << path << "\n";
-
-        std::string new_input;
-
-        if(input.rfind(".wav.vtt") != std::string::npos || input.rfind(".mp3.vtt") != std::string::npos)
+        else
         {
-            int n = input.rfind(".vtt");
-            new_input = input.substr(0,n-4) +".vtt";
-
-            fs::path newpath(new_input);
-
-            if(fs::exists(newpath) && fs::is_regular_file(newpath))
+            path = vttfile(input);
+            if(path == "-1") 
             {
-                printf("已有与改名后同名的文件存在\n");
-                system("pause");
-                exit(1);
+                std::cout << input << " 该文件不为.vtt文件\n";
+                continue; 
             }
-
-            fs::rename(path,newpath);
-            std::cout << input << "改名完成\n"; 
-
-            std::cout << input << "开始生成lrc文件\n";
-            vtt_to_lrc(new_input.substr(0,new_input.rfind(".vtt")));
-        }
-        else if(input.rfind(".vtt") != std::string::npos)
-        {
-            std::cout << input << "开始生成lrc文件\n";
-            vtt_to_lrc(input.substr(0,input.rfind(".vtt")));
-        }
+            vtt_to_lrc(path);
+        } 
+        
+        std::cout << path <<" 转换完毕\n";
+        system("pause");
+        system("cls");
     }
     
+    std::cout <<"感谢你的使用\n";
+
     system("pause");
 
     return 0;
