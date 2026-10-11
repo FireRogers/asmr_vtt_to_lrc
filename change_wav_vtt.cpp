@@ -3,6 +3,7 @@
 #include <string>
 #include <windows.h> 
 #include <fstream>
+#include <vector>
 
 namespace fs = std::filesystem;
 
@@ -122,12 +123,10 @@ void vtt_to_lrc(std::string path) //转化path路径(不包含后缀名)的vtt�
         start_time = line.substr(0,pos);//把箭头前的时间截出来
 
         while(start_time.back() == ' ') start_time.pop_back(); //去除空格
-
         start_time = lrctime.lrctime(start_time);
-
         if(start_time == "-1")
         {
-            printf("某处的开始时间格式错误");
+            printf("开始时间格式错误");
             system("pause");
             exit(1);
         }
@@ -197,13 +196,15 @@ std::string vttfile(std::string s) //生成vtt文件,返回路径
         fs::rename(path,new_path);
         return new_path.string();
     } 
-    else if(s.rfind(".vtt") != std::string::npos || s.rfind(".vtt") != std::string::npos)
-    {
-        return s;
-    }
-    
-    return "-1";
+    return s;
 } 
+
+void change_wav_vtt(std::string input)
+{
+    std::string path = vttfile(input);
+    std::cout << input << " 正在生成lrc\n";
+    vtt_to_lrc(path.substr(0,path.size()-4));
+}
 
 int main()
 {
@@ -213,8 +214,14 @@ int main()
     std::string input; //输入的地址
     std::string path; //修完后的地址
 
-    bool file;//输入的是文件夹还是vtt文件,true为文件夹
-    
+    std::string photoEX = ".jpg.jpeg.png.gif.bmp.webp.tif.tiff.ico.heic"; //常见图片后缀名
+
+    int file;/*
+    1.下一级为vtt文件的文件夹
+    2.属于RJ文件夹的文件夹
+    3.vtt文件
+    */
+
     while(1)
     {
         std::cout << "请输入你要转换的文件绝对地址,或者文件夹绝对地址\n";
@@ -233,15 +240,81 @@ int main()
 
         fs::path p = input;
 
-        if(fs::exists(p) && fs::is_directory(p)) file = true;
-        else if(fs::exists(p) && fs::is_regular_file(p)) file = false;
+        if(fs::exists(p) && fs::is_directory(p)) 
+        {
+            file = 2;
+            for (const auto& entry : fs::directory_iterator(input))
+            {
+                if(entry.path().extension() == ".vtt") //只要在当前文件夹下有vtt文件就不处理其他文件夹
+                {
+                    file = 1;
+                    break;
+                }
+            }
+        }
+        else if(fs::exists(p) && fs::is_regular_file(p)) file = 3;
         else{
             std::cout << input << " 输入的地址不存在\n";
             system("pause");system("cls");
             continue;
         } 
 
-        if(file)
+        //以上是对输入地址的处理
+
+        if(file == 2) //需要创建一个文件夹,把图片文件统一存在那里,删除所有空文件夹
+        {
+            std::string photopos = input + "\\插图";//图片的储存位置
+            char id[6] = "00000";
+            fs::create_directories(photopos);
+
+            for (const auto& entry : fs::recursive_directory_iterator(input))
+            {
+                path = entry.path().string();
+                if(fs::is_directory(path)) continue;
+                else if(entry.path().string().find(photopos + "\\") != std::string::npos) continue;
+                else if(fs::is_regular_file(path) && entry.path().extension() == ".vtt")
+                {
+                    change_wav_vtt(path);
+                }
+                else if(fs::is_regular_file(path) && photoEX.find(entry.path().extension().string()) != std::string ::npos)
+                {
+                    for(int i = sizeof(id)-2; i >= 0;i--)
+                    {
+                        if(id[i] < '9')
+                        {
+                            id[i]++;
+                            break;
+                        }
+                        id[i] = '0';
+                    }
+
+                    fs::rename(path,photopos+ "\\" + id + entry.path().extension().string());
+                }
+            }
+
+            std::vector<fs::path> v; //所有文件夹位置
+
+            for (const auto& entry : fs::recursive_directory_iterator(input))
+            {
+                if(!fs::is_regular_file(entry.path()))
+                {
+                    v.push_back(entry.path());
+                }
+            }
+            if(v.size() != 0)
+            {
+                for(std::size_t i = v.size(); i-- > 0;)
+                {
+                    if(fs::is_empty(v[i]))
+                    {
+                        fs::remove(v[i]);
+                        std::cout << v[i] << " 空文件夹已被删除\n";
+                    }
+                }
+            }
+
+        }
+        else if(file == 1)
         {
             for (const auto& entry : fs::directory_iterator(input))
             {
@@ -253,29 +326,26 @@ int main()
                 }
                 else if(fs::is_regular_file(entry))
                 {
-                    path = vttfile(entry.path().string());
-                    if(path == "-1") 
+                    if(entry.path().extension() != ".vtt")
                     {
-                        std::cout << input << " 该文件不为.vtt文件\n";
-                        continue; 
+                        std::cout << input << " 该文件不为.vtt格式\n";
+                        continue;
                     }
-                    std::cout << entry << " 正在生成lrc\n";
-                    vtt_to_lrc(path.substr(0,path.size()-4));
+                    change_wav_vtt(entry.path().string());
                 }
             }
         }
         else
         {
-            path = vttfile(input);
-            if(path == "-1") 
+            if(p.extension() == ".vtt")
             {
-                std::cout << input << " 该文件不为.vtt文件\n";
-                continue; 
+                std::cout << input << " 该文件不为.vtt格式\n";
+                continue;
             }
-            vtt_to_lrc(path.substr(0,path.size()-4));
+            change_wav_vtt(input);
         } 
         
-        std::cout << path <<" 转换完毕\n";
+        std::cout << input <<" 转换完毕\n";
         system("pause");
         system("cls");
     }

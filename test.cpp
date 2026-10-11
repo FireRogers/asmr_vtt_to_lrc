@@ -1,18 +1,22 @@
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <filesystem>
+
 
 int main()
 {
+    char id[5] = "0909";
 
-    std::string input = "  15168484865   \"";
+    for(int i = sizeof(id)-2; i > 0;i--)
+    {
+        if(id[i] < '9')
+        {
+            id[i]++;
+            break;
+        }
+        id[i] = '0';
+    }
 
-    std::size_t s = input.find_first_not_of(" \t\r\n");
-    
-    if(s != std::string::npos) input = input.substr(s,input.size() - s);
-
-    s = input.find_last_not_of(" \t\r\n\"");
-
-    if(s != std::string::npos) input = input.substr(0,s+1);
-
-    std::cout << input;
+    std::cout << id;
 }
