@@ -82,14 +82,17 @@ void vtt_to_lrc(std::string path) //转化path路径(不包含后缀名)的vtt�
     std::cout << path + ".vtt"<< "\n";
     
     std::ifstream old_vtt(fs::path(path + ".vtt"));
-    std::ofstream new_lrc(fs::path(path + ".lrc"));
-
-    std::string line;
 
     if (!old_vtt) {
     std::cerr << "打不开文件: " << fs::absolute(path + ".vtt") << std::endl;
     return;
     }
+
+    std::ofstream new_lrc(fs::path(path + ".lrc"));
+
+    std::string line;
+
+
 
     bool first = true;
 
@@ -106,7 +109,7 @@ void vtt_to_lrc(std::string path) //转化path路径(不包含后缀名)的vtt�
         std::cout << line << "\n";
         std::string text;//台词文本
 
-        std::size_t pos = line.find("-->");
+        std::size_t pos = line.rfind("-->");
 
         if(pos == std::string::npos) continue;
 
@@ -128,8 +131,8 @@ void vtt_to_lrc(std::string path) //转化path路径(不包含后缀名)的vtt�
         {
             while(std::getline(old_vtt,temp))
             {
+                if(!temp.empty() && temp.back() == '\r') temp.pop_back();
                 if(temp.empty()) break;
-                if(temp.back() == '\r') temp.pop_back();
                 if(!text.empty()) text += ' ';
                 text += temp;
             }
@@ -140,8 +143,8 @@ void vtt_to_lrc(std::string path) //转化path路径(不包含后缀名)的vtt�
             new_lrc << end_time << '\n';
             while(std::getline(old_vtt,temp))
             {
+                if(!temp.empty() && temp.back() == '\r') temp.pop_back();
                 if(temp.empty()) break;
-                if(temp.back() == '\r') temp.pop_back();
                 if(!text.empty()) text += ' ';
                 text += temp;
             }
@@ -235,30 +238,32 @@ int main()
 
             std::string new_input;
 
-            if(i_path.find(".wav.vtt") != std::string::npos || i_path.find(".mp3.vtt") != std::string::npos)
+            if(i_path.rfind(".wav.vtt") != std::string::npos || i_path.rfind(".mp3.vtt") != std::string::npos)
             {
-                int n = i_path.find(".vtt");
+                int n = i_path.rfind(".vtt");
                 new_input = i_path.substr(0,n-4) +".vtt";
 
                 fs::path newpath(new_input);
+
+                if(fs::exists(i_path) && fs::is_directory(i_path)) continue;
 
                 if(fs::exists(newpath) && fs::is_regular_file(newpath))
                 {
                     printf("已有与改名后同名的文件存在\n");
                     system("pause");
-                    exit(1);
+                    continue;
                 }
 
                 fs::rename(path,newpath);
                 std::cout << i_path << "改名完成\n"; 
 
                 std::cout << i_path << "开始生成lrc文件\n";
-                vtt_to_lrc(new_input.substr(0,new_input.find(".vtt")));
+                vtt_to_lrc(new_input.substr(0,new_input.rfind(".vtt")));
             }
-            else if(i_path.find(".vtt") != std::string::npos)
+            else if(i_path.rfind(".vtt") != std::string::npos)
             {
                 std::cout << i_path << "开始生成lrc文件\n";
-                vtt_to_lrc(i_path.substr(0,i_path.find(".vtt")));
+                vtt_to_lrc(i_path.substr(0,i_path.rfind(".vtt")));
             }
         }
     }
@@ -270,9 +275,9 @@ int main()
 
         std::string new_input;
 
-        if(input.find(".wav.vtt") != std::string::npos || input.find(".mp3.vtt") != std::string::npos)
+        if(input.rfind(".wav.vtt") != std::string::npos || input.rfind(".mp3.vtt") != std::string::npos)
         {
-            int n = input.find(".vtt");
+            int n = input.rfind(".vtt");
             new_input = input.substr(0,n-4) +".vtt";
 
             fs::path newpath(new_input);
@@ -288,12 +293,12 @@ int main()
             std::cout << input << "改名完成\n"; 
 
             std::cout << input << "开始生成lrc文件\n";
-            vtt_to_lrc(new_input.substr(0,new_input.find(".vtt")));
+            vtt_to_lrc(new_input.substr(0,new_input.rfind(".vtt")));
         }
-        else if(input.find(".vtt") != std::string::npos)
+        else if(input.rfind(".vtt") != std::string::npos)
         {
             std::cout << input << "开始生成lrc文件\n";
-            vtt_to_lrc(input.substr(0,input.find(".vtt")));
+            vtt_to_lrc(input.substr(0,input.rfind(".vtt")));
         }
     }
     
