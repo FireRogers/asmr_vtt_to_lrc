@@ -244,13 +244,13 @@ int main()
                 }
                 else if(fs::is_regular_file(entry))
                 {
-                    std::cout << entry << " 正在生成lrc\n";
                     path = vttfile(entry.path().string());
                     if(path == "-1") 
                     {
                         std::cout << input << " 该文件不为.vtt文件\n";
                         continue; 
                     }
+                    std::cout << entry << " 正在生成lrc\n";
                     vtt_to_lrc(path);
                 }
             }
