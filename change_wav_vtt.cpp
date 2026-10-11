@@ -9,14 +9,12 @@ namespace fs = std::filesystem;
 class lrcTime //处理时间的工具
 {
     public:
-    
-    std::string worry_time = "0"; //出错时返回的值
 
     std::string lrctime(std::string time) //把空格处理完后的时间string丢进来处理,返回[00:00.00]
     {
         long s_time = toTime(time);
     
-        if(s_time == 0) return worry_time;
+        if(s_time == -1) return "-1";
     
         s_time = (s_time+5)/10 *10;
         time = finishString(s_time);
@@ -32,7 +30,7 @@ private:
         {
             return (h*3600000 + m*60000 + s*1000 + ms);
         }
-        return (int)(worry_time[0]-'0');
+        return -1;
     }
     
     std::string int_to_string(int a) //把时间转化为00
@@ -127,7 +125,7 @@ void vtt_to_lrc(std::string path) //转化path路径(不包含后缀名)的vtt�
 
         start_time = lrctime.lrctime(start_time);
 
-        if(start_time == lrctime.worry_time)
+        if(start_time == "-1")
         {
             printf("某处的开始时间格式错误");
             system("pause");
@@ -164,7 +162,7 @@ void vtt_to_lrc(std::string path) //转化path路径(不包含后缀名)的vtt�
         end_time = line.substr(pos + 3,line.size() -pos -3);
         while(end_time.front() == ' ') end_time.erase(0,1);
         end_time = lrctime.lrctime(end_time);
-        if(end_time == lrctime.worry_time)
+        if(end_time == "-1")
         {
             printf("某处的结束时间格式错误");
             system("pause");
@@ -227,7 +225,7 @@ int main()
         if(input == "0") break;
         else if(input.size() < 3) {
             std::cout << "输入地址过短\n";
-            system("puase");system("cls");
+            system("pause");system("cls");
             continue;
         }
 
@@ -239,7 +237,7 @@ int main()
         else if(fs::exists(p) && fs::is_regular_file(p)) file = false;
         else{
             std::cout << input << " 输入的地址不存在\n";
-            system("puase");system("cls");
+            system("pause");system("cls");
             continue;
         } 
 
