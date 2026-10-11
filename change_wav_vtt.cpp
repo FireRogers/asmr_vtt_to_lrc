@@ -214,7 +214,7 @@ int main()
     std::string input; //输入的地址
     std::string path; //修完后的地址
 
-    std::string photoEX = ".jpg.jpeg.png.gif.bmp.webp.tif.tiff.ico.heic"; //常见图片后缀名
+    std::string photoEX = ".jpg.jpeg.png.gif.bmp.webp.JPG.JPEG.PNG.GIF.BMP.WEBP"; //常见图片后缀名
 
     int file;/*
     1.下一级为vtt文件的文件夹
@@ -261,17 +261,19 @@ int main()
 
         //以上是对输入地址的处理
 
+        std::cout << file << "\n";
+
         if(file == 2) //需要创建一个文件夹,把图片文件统一存在那里,删除所有空文件夹
         {
-            std::string photopos = input + "\\插图";//图片的储存位置
+            std::string photopos = input;//图片的储存位置
             char id[6] = "00000";
             fs::create_directories(photopos);
 
             for (const auto& entry : fs::recursive_directory_iterator(input))
             {
                 path = entry.path().string();
+                std::cout << path << "\n";
                 if(fs::is_directory(path)) continue;
-                else if(entry.path().string().find(photopos + "\\") != std::string::npos) continue;
                 else if(fs::is_regular_file(path) && entry.path().extension() == ".vtt")
                 {
                     change_wav_vtt(path);
@@ -337,7 +339,7 @@ int main()
         }
         else
         {
-            if(p.extension() == ".vtt")
+            if(p.extension() != ".vtt")
             {
                 std::cout << input << " 该文件不为.vtt格式\n";
                 continue;
