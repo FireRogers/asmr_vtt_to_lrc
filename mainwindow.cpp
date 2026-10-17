@@ -169,6 +169,11 @@ void MainWindow::on_pushout_triggered()
     
 }
 
+void MainWindow::on_pushout_2_triggered()
+{
+    on_pushout_triggered();
+}
+
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)
 {
     if(event->mimeData()->hasUrls())

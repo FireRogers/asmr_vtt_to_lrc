@@ -39,5 +39,6 @@ private slots:
     void on_help_triggered(); 
     void on_setting_triggered();
     void on_pushout_triggered();
+    void on_pushout_2_triggered();
 
 };

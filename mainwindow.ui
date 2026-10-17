@@ -100,7 +100,7 @@ font-weight: bold;
             <x>0</x>
             <y>0</y>
             <width>673</width>
-            <height>165</height>
+            <height>131</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -209,6 +209,18 @@ font-weight: bold;
            </widget>
           </item>
           <item>
+           <widget class="QPushButton" name="pushout_2">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+             </font>
+            </property>
+            <property name="text">
+             <string>输出 F1</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Orientation::Vertical</enum>
@@ -254,7 +266,7 @@ font-weight: bold;
     <string>help</string>
    </property>
    <property name="shortcut">
-    <string>F1</string>
+    <string>F3</string>
    </property>
   </action>
   <action name="setting">
@@ -270,7 +282,7 @@ font-weight: bold;
     <string>输出</string>
    </property>
    <property name="shortcut">
-    <string>F3</string>
+    <string>F1</string>
    </property>
   </action>
  </widget>
