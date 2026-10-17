@@ -98,9 +98,9 @@ font-weight: bold;
           <property name="geometry">
            <rect>
             <x>0</x>
-            <y>0</y>
-            <width>673</width>
-            <height>131</height>
+            <y>-38</y>
+            <width>661</width>
+            <height>169</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -169,6 +169,31 @@ font-weight: bold;
                   <string>所有vtt文件</string>
                  </property>
                 </item>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="widget_5" native="true">
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <widget class="QLabel" name="label_3">
+                <property name="font">
+                 <font>
+                  <pointsize>12</pointsize>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>转化vtt完成后删除原文件</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="checkBox">
+                <property name="text">
+                 <string/>
+                </property>
                </widget>
               </item>
              </layout>
@@ -321,30 +346,14 @@ font-weight: bold;
    </hints>
   </connection>
   <connection>
-   <sender>DefaultChoose</sender>
-   <signal>activated(int)</signal>
-   <receiver>settingwidget</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>613</x>
-     <y>306</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>561</x>
-     <y>354</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>pushButton</sender>
    <signal>clicked()</signal>
    <receiver>textEdit</receiver>
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>711</x>
-     <y>393</y>
+     <x>772</x>
+     <y>375</y>
     </hint>
     <hint type="destinationlabel">
      <x>575</x>

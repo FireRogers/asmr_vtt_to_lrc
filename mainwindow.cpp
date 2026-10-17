@@ -20,11 +20,10 @@
 #include <QLineEdit>
 #include <QTextDocument>
 #include <QTextBlock> 
+#include <QCheckBox>
 
 #include <filesystem>
 namespace fs = std::filesystem;
-
-
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -65,12 +64,16 @@ void MainWindow::loadSettings()
 
     QString line1 = line.readLine();
     QString line2 = line.readLine();
+    QString line3 = line.readLine();
 
     if(!line1.isEmpty()) photopath->setText(line1); 
     else photopath->clear();
 
     if (!line2.isEmpty()) combobox->setCurrentText(line2);
     else combobox->setCurrentText("需转移图片");
+
+    if (!line3.isEmpty() && line3 == "1") ui->checkBox->setChecked(1);
+    else ui->checkBox->setChecked(0);
 
     save.close();
 }
@@ -83,12 +86,17 @@ void MainWindow::saveSettings()
     QComboBox *combobox = ui->DefaultChoose;
     QLineEdit *photopath = ui->PhotoPath;
 
+    bool del = ui->checkBox->isChecked();
+
     text.setEncoding(QStringConverter::Utf8); 
 
     if(photopath->text().isEmpty()) text << '\n';
     else text << photopath->text() << '\n';
 
-    text << combobox->currentText();
+    text << combobox->currentText() << '\n';
+    
+    text << del << '\n';
+    
     text.flush();
     save.close();
 }
@@ -119,6 +127,7 @@ void MainWindow::on_pushout_triggered()
 
     QTextDocument *DocumentEdit = textedits->document();
     int lineN = DocumentEdit->blockCount();
+    bool del = ui->checkBox->isChecked();
 
     for(int i = 0; i < lineN;i++)
     {
@@ -141,7 +150,7 @@ void MainWindow::on_pushout_triggered()
 
         if(Qline.endsWith(".vtt",Qt::CaseInsensitive))
         {
-            if(!RJ.organizeRj(line,"",3))
+            if(!RJ.organizeRj(line,"",3,del))
             {
                 qInfo() << "失败";
                 continue;
@@ -149,7 +158,7 @@ void MainWindow::on_pushout_triggered()
         }
         else if(fs::is_directory(path) && choose == "需转移图片")
         {
-            if(!RJ.organizeRj(line,photoPath,2))
+            if(!RJ.organizeRj(line,photoPath,2,del))
             {
                 qInfo() << "失败";
                 continue;
@@ -157,7 +166,7 @@ void MainWindow::on_pushout_triggered()
         }
         else if(fs::is_directory(path) && choose == "所有vtt文件")
         {
-            if(!RJ.organizeRj(line,"",1))
+            if(!RJ.organizeRj(line,"",1,del))
             {
                 qInfo() << "失败";
                 continue;
