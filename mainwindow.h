@@ -26,8 +26,6 @@ protected:
     // 在窗口上松开鼠标时触发
     void dropEvent(QDropEvent *event) override;
 
-    
-
 private:
     Ui::MainWindow *ui;
 
@@ -39,6 +37,5 @@ private slots:
     void on_help_triggered(); 
     void on_setting_triggered();
     void on_pushout_triggered();
-    void on_pushout_2_triggered();
 
 };

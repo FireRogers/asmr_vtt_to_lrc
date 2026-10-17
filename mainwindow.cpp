@@ -33,6 +33,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->helpwidget->setVisible(false); 
     ui->settingwidget->setVisible(false);
     ui->textEdit->setAcceptDrops(false); 
+
+    connect(ui->seenPushout, &QPushButton::clicked, this, &MainWindow::on_pushout_triggered);
+
     loadSettings();
 }
 
@@ -176,11 +179,6 @@ void MainWindow::on_pushout_triggered()
     }
     textedits->clear();
     
-}
-
-void MainWindow::on_pushout_2_triggered()
-{
-    on_pushout_triggered();
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *event)

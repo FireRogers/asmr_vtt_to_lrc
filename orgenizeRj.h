@@ -142,14 +142,15 @@ class orgenizeRj : private lrcTime //转化Rj下的vtt成lrc,把图片转移的�
     {
         std::string path = vttfile(input);
         qInfo() << QString::fromStdString(input + " 正在生成lrc\n");
-        if(vtt_to_lrc(path.substr(0,path.size()-4),del))
+        if(vtt_to_lrc(path.substr(0,path.size()-4)))
         {
+            if(del) fs::remove(path);
             return 1;
         }
         return 0;
     }
 
-    bool vtt_to_lrc(std::string path,bool del) //转化path路径(不包含后缀名)的vtt文件为lrc
+    bool vtt_to_lrc(std::string path) //转化路径为path(不包含后缀名)的vtt文件为lrc
     {
         qInfo() << QString::fromStdString(path + ".vtt" + "\n");
         
@@ -241,14 +242,10 @@ class orgenizeRj : private lrcTime //转化Rj下的vtt成lrc,把图片转移的�
     
         new_lrc << end_time << "\n";
 
-        if(del)
-        {
-            fs::remove(path + ".vtt" );
-        }
         return 1;
     }
 
-    std::string vttfile(std::string s) //生成vtt文件,返回路径
+    std::string vttfile(std::string s) //重命名.wav.vtt为.vtt文件,返回路径
     {
         qInfo() << QString::fromStdString( s + " 开始\n");
     

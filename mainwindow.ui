@@ -185,7 +185,7 @@ font-weight: bold;
                  </font>
                 </property>
                 <property name="text">
-                 <string>转化vtt完成后删除原文件</string>
+                 <string>生成lrc文件后删除原vtt文件</string>
                 </property>
                </widget>
               </item>
@@ -234,7 +234,7 @@ font-weight: bold;
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushout_2">
+           <widget class="QPushButton" name="seenPushout">
             <property name="font">
              <font>
               <pointsize>12</pointsize>
